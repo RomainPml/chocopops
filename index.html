@@ -1,78 +1,117 @@
 <!DOCTYPE html>
 <html lang="fr">
-<head>
+  <head>
     <title>EPITA 2023 - SIGL</title>
     <style>
-        body {
-            background: #000000; 
-        }
+      body {
+        background: #161fd5;
+      }
 
-        #container {
-            margin : auto; 
-            border: 1px solid white;
-            background: #000000;
-        }
-        
-        #player1 {
-                margin : auto; 
-                text-align: center;
-        }
+      #container {
+        margin: auto;
+        border: 1px solid white;
+        background: #f4f4f4;
+        margin-top: auto;
+      }
 
-        .life {
-            color:white;
-        }
+      #player1 {
+        margin: auto;
+        text-align: center;
+      }
+
+      #player2 {
+        margin: auto;
+        text-align: center;
+      }
+
+      .life {
+        color: rgb(0, 85, 14);
+        font-weight: bold;
+      }
+
+      #players {
+        background: #ebefb8;
+        display: flex;
+        max-width: 50%; /* Définissez la largeur maximale souhaitée (par exemple, 80%) */
+        height: 10em; /* Définissez la largeur maximale souhaitée (par exemple, 80%) */
+        margin: 0 auto; /* Pour centrer la div horizontalement */
+      }
     </style>
-</head>
+  </head>
 
-<body>
+  <body>
     <div id="container"></div>
-    <div id="player1">
-        <strong>Joueur 1</strong>
+    <div id="players">
+      <div id="player1">
+        <h1>Joueur 1</h1>
         <span class="life">3</span> vies
+      </div>
+      <div id="player2">
+        <h1>Ennemi</h1>
+        <span class="life">3</span> vies
+      </div>
     </div>
-</body>
+  </body>
 
-<script src="js/three.min.js"></script>
-<script src="js/jquery.min.js"></script>
-<script src="js/OrbitControls.js"></script>
-<script src="js/THREEx.KeyboardState.js"></script>
-<script src="game/player.js"></script>
-<script src="game/graphic.js"></script>
-<script src="game/physic.js"></script>
-<script src="game/shoot.js"></script>
+  <script src="js/three.min.js"></script>
+  <script src="js/jquery.min.js"></script>
+  <script src="js/OrbitControls.js"></script>
+  <script src="js/THREEx.KeyboardState.js"></script>
+  <script src="game/player.js"></script>
+  <script src="game/graphic.js"></script>
+  <script src="game/physic.js"></script>
+  <script src="game/shoot.js"></script>
 
-<script type="text/javascript">
+  <script type="text/javascript">
     var container, scene, camera, renderer, controls, stats;
     var keyboard = new THREEx.KeyboardState();
     var clock = new THREE.Clock();
-    var player1,
-        player2;
+    var player1, player2;
     var WIDTH = 600,
-        HEIGHT = 400;
+      HEIGHT = 400;
 
     init();
     animate();
 
-    function animate()
-    {
-        requestAnimationFrame(animate);
-        render();
-        update();
+    function animate() {
+      requestAnimationFrame(animate);
+      render();
+      update();
+      player1.displayInfo();
+      player2.displayInfo();
+      shoot();
+      collisions();
+
+      player2.position.y += player2.horizontalSpeed;
+      player2.graphic.position.y += player2.horizontalSpeed;
+
+      if (player2.position.y <= -200 || player2.position.y >= 200) {
+        player2.horizontalSpeed = -player2.horizontalSpeed;
+      }
+
+      var distance = player1.graphic.position.distanceTo(
+        player2.graphic.position
+      );
+
+      if (distance < 10) {
+        player1.life--;
+
         player1.displayInfo();
-        shoot();
-        collisions();
+
+        player1.graphic.position.set(50, 0, 2);
+
+        if (player1.life <= 0) {
+          player1.dead();
+        }
+      }
     }
 
-    function render()
-    {
-        renderer.render(scene, camera);
+    function render() {
+      renderer.render(scene, camera);
     }
 
-    $(document).ready(function() {
-        $('#container')
-            .css('width', WIDTH)
-            .css('height', HEIGHT)
-        ;
+    $(document).ready(function () {
+      $("#container").css("width", WIDTH).css("height", HEIGHT);
     });
-</script>
+  </script>
 </html>
